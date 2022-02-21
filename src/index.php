@@ -29,14 +29,16 @@
 			$username = $_POST["user"];
 			$pass = $_POST["password"];
 			# (2.1) creem el string de la consulta (query)
-			$qstr = "SELECT * FROM users WHERE name='$username' AND password=SHA2('$pass',512);";
-			$consulta = $pdo->prepare($qstr);
+			#ALBA: Para evitar el sql Injection emplearemos la tecnica de Bind Param con Placeholders
+			$qstr = "SELECT * FROM users WHERE name=? AND password=SHA2(?,512);";
 
+			$consulta = $pdo->prepare($qstr);
+			
 			# mostrem la SQL query per veure el què s'executarà (a mode debug)
 			echo "<br>$qstr<br>";
 
 			# Enviem la query al SGBD per obtenir el resultat
-			$consulta->execute();
+			$consulta->execute(array($username,$pass));
 	 
 			# Gestió d'errors
 			if( $consulta->errorInfo()[1] ) {
@@ -53,11 +55,12 @@
 				echo "<div class='user'>No hi ha cap usuari amb aquest nom o contrasenya.</div>";
 		}
  	?>
+
  	
  	<fieldset>
  	<legend>Login form</legend>
   	<form method="post">
-		User: <input type="text" name="user" /><br>
+		Username: <input type="text" name="user" /><br>
 		Pass: <input type="text" name="password" /><br>
 		<input type="submit" /><br>
  	</form>
